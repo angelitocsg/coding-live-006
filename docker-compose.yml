@@ -1,0 +1,16 @@
+# docker-compose -p codinglive006 up -d
+
+version: "3"
+
+services:
+    rabbitmq:
+        container_name: cl6-rabbitmq
+        image: rabbitmq:3-management-alpine
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - "rabbitmq-data:/var/lib/rabbitmq"
+
+volumes:
+    rabbitmq-data:
