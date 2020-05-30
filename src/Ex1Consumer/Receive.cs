@@ -19,31 +19,29 @@ namespace Ex1Consumer
                                      autoDelete: false,
                                      arguments: null);
 
-                while (true)
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
                 {
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
+                    try
                     {
-                        try
-                        {
-                            var body = ea.Body;
-                            var message = Encoding.UTF8.GetString(body.ToArray());
-                            Console.WriteLine($"[x] Received: {message}");
+                        var body = ea.Body;
+                        var message = Encoding.UTF8.GetString(body.ToArray());
+                        Console.WriteLine($"[x] Received: {message}");
 
-                            channel.BasicAck(ea.DeliveryTag, false);
-                        }
-                        catch
-                        {
-                            var retryQueue = true;
-                            channel.BasicNack(ea.DeliveryTag, false, retryQueue);
-                        }
-                    };
-                    channel.BasicConsume(queue: "hello",
-                                         autoAck: false, // deal with fails
-                                         consumer: consumer);
+                        channel.BasicAck(ea.DeliveryTag, false);
+                    }
+                    catch
+                    {
+                        var retryQueue = true;
+                        channel.BasicNack(ea.DeliveryTag, false, retryQueue);
+                    }
+                };
+                channel.BasicConsume(queue: "hello",
+                                     autoAck: false, // deal with fails
+                                     consumer: consumer);
 
-                    System.Threading.Thread.Sleep(100);
-                }
+                Console.WriteLine(" Press [enter] to exit.");
+                Console.ReadLine();
             }
         }
     }
